@@ -22,6 +22,7 @@ jobs:
         working-directory: deploy-ml
       - name: cat dataset
         run: cat data/heart_disease.csv
+        working-directory: deploy-ml
       - name: train model
         run: python model/train.py
         working-directory: deploy-ml
