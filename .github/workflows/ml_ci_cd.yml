@@ -16,7 +16,7 @@ jobs:
         run: python --version
       - name: cd folder
         run: cd deploy-ml
-      - name: pip install
+      - name: cd deploy-ml
         run: pip install -r requirements.txt
       - name: train model
         run: python model/train.py
