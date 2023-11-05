@@ -16,13 +16,13 @@ jobs:
         run: python --version
       - name: pip install
         run: pip install -r requirements.txt
-        working-directory: ./deply-ml
+        working-directory: deploy-ml
       - name: train model
         run: python model/train.py
-        working-directory: ./deply-ml
+        working-directory: deploy-ml
       - name: docker build
         run: docker build -t ${{secrets.DOCKER_USER}}/${{secrets.MODEL_NAME}}:${{github.sha}} .
-        working-directory: ./deply-ml
+        working-directory: deploy-ml
       - name: show images
         run: docker images
       - name: docker login
