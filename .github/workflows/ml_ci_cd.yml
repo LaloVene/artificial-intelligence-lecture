@@ -53,10 +53,10 @@ jobs:
 
       - name: Deploy and Wait
         uses: okteto/actions/deploy@v1
+        working-directory: deploy-ml
         env:
           KUBECONFIG: ${{ steps.namespace.outputs.kubeconfig }}
         with:
           namespace: ${{secrets.OKTETO_NAMESPACE }}
           manifest: manifests/k8s.yml
           tag: ${{ secrets.DOCKER_USERNAME }}/${{secrets.MODEL_NAME}}:${{ github.sha }}
-          working-directory: deploy-ml
