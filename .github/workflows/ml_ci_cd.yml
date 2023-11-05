@@ -17,11 +17,16 @@ jobs:
       - name: pip install
         run: pip install -r requirements.txt
         working-directory: deploy-ml
+      - name: download dataset
+        run: wget -O data/heart_disease.csv ${{github.event.client_payload.dataseturl}}
+        working-directory: deploy-ml
+      - name: cat dataset
+        run: cat data/heart_disease.csv
       - name: train model
         run: python model/train.py
         working-directory: deploy-ml
       - name: docker build
-        run: docker build -t ${{secrets.DOCKER_USER}}/${{secrets.MODEL_NAME}}:${{github.sha}} .
+        run: docker build -t ${{secrets.DOCKER_USER}}/${{secrets.MODEL_NAME}}:${{github.event.client_payload.sha}} .
         working-directory: deploy-ml
       - name: show images
         run: docker images
@@ -30,8 +35,8 @@ jobs:
           DOCKER_USER: ${{secrets.DOCKER_USER}}
           DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
         run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-      - name: docker Push
-        run: docker push ${{secrets.DOCKER_USER}}/${{secrets.MODEL_NAME}}:${{ github.sha }}
+       - name: docker Push
+        run: docker push ${{secrets.DOCKER_USER}}/${{secrets.MODEL_NAME}}:${{github.event.client_payload.sha }}
       - name: update docker user in k8
         run: sed -i 's/{docker_user}/${{secrets.DOCKER_USER}}/g' manifests/k8s.yml
         working-directory: deploy-ml
@@ -42,7 +47,7 @@ jobs:
         run: sed -i 's/_/-/g' manifests/k8s.yml
         working-directory: deploy-ml
       - name: update sha in k8
-        run: sed -i 's/{github.sha}/${{ github.sha }}/g' manifests/k8s.yml
+        run: sed -i 's/{github.sha}/${{github.event.client_payload.sha }}/g' manifests/k8s.yml
         working-directory: deploy-ml
       - name: show k8s.yml
         run: cat manifests/k8s.yml
