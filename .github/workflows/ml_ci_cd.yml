@@ -1,9 +1,9 @@
 name: Model ops deploy
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
   repository_dispatch:
     types: [ml_ci_cd]
 
@@ -11,6 +11,21 @@ jobs:
   ml_ci_cd:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: python version
-      run: python --version
+      - uses: actions/checkout@v2
+      - name: python version
+        run: python --version
+      - name: pip install
+        run: pip install -r requirements.txt
+      - name: train model
+        run: python model/train.py
+      - name: docker build
+        run: docker build -t ${{secrets.DOCKER_USER}}/${{secrets.MODEL_NAME}}:${{github.sha}} .
+      - name: show images
+        run: docker images
+      - name: docker login
+        env:
+          DOCKER_USER: ${{secrets.DOCKER_USER}}
+          DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+        run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+      - name: docker Push
+        run: docker push ${{secrets.DOCKER_USER}}/${{secrets.MODEL_NAME}}:${{ github.sha }}
