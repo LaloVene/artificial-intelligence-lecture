@@ -1,0 +1,35 @@
+#manifest
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-site-deployment
+spec:
+  selector:
+    matchLabels:
+      app: demo-site-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: demo-site-server
+    spec:
+      containers:
+        - name: demo-site-container
+          #image: gcr.io/tensorflow-serving/resnet
+          image: docker.io/lalovene/tensorflow-demo-site:{github.sha}
+          ports:
+            - containerPort: 8501
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: demo-site-service
+  name: demo-site-service
+spec:
+  ports:
+    - port: 8501
+      targetPort: 8501
+  selector:
+    app: demo-site-server
+  type: LoadBalancer

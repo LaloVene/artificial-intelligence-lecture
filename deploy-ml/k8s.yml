@@ -1,0 +1,35 @@
+#manifest
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: heartmodel-deployment
+spec:
+  selector:
+    matchLabels:
+      app: heartmodel-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: heartmodel-server
+    spec:
+      containers:
+        - name: heartmodel-container
+          #image: gcr.io/tensorflow-serving/resnet
+          image: docker.io/lalovene/heartmodel
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: heartmodel-service
+  name: heartmodel-service
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: heartmodel-server
+  type: LoadBalancer
